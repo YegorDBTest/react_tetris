@@ -10,11 +10,21 @@ class Field {
    * @param {number} height - Field height.
    */
   constructor(width, height) {
+    this._width = width;
     this._height = height;
+    this._squareSide = 10;
     this._matrix = [];
     for (let i = 0; i < width; i++) {
       this._matrix.push(this._createEmptyRow());
     }
+
+    this._screen = new TDG.screen.Screen('field-element', {
+      dimensions: [width * this._squareSide, height * this._squareSide],
+    });
+    this._screen.addLayer('background', new TDG.layers.CanvasLayer);
+    this._drawBackground();
+    // this._screen.addLayer('static', new TDG.layers.CanvasLayer);
+    // this._screen.addLayer('dynamic', new TDG.layers.SVGLayer);
   }
 
   /**
@@ -57,10 +67,26 @@ class Field {
       console.log(row.map(s => s? 1 : 0));
     }
   }
+
+  /**
+   * Draw background.
+   * @private
+   */
+  _drawBackground() {
+    this._screen.layers.background.ctx.strokeStyle = '#333333';
+    for (let i = 0; i < this._width; i++) {
+      for (let j = 0; j < this._height; j++) {
+        let x = this._squareSide * i;
+        let y = this._squareSide * j;
+        this._screen.layers.background.ctx.rect(x, y, this._squareSide, this._squareSide);
+        this._screen.layers.background.ctx.stroke();
+      }
+    }
+  }
 }
 
 
-window.field = new Field(3, 3);
+window.field = new Field(10, 20);
 
 
 class HelloMessage extends React.Component {
