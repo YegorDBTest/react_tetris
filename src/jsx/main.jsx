@@ -2,6 +2,14 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 
+/*
+background     #f8f5f1
+background-net #45526c
+solid-items    #5aa897
+movable-items  #f8a488
+*/
+
+
 class Field {
 
   /**
@@ -14,16 +22,16 @@ class Field {
     this._height = height;
     this._squareSide = 10;
     this._matrix = [];
-    for (let i = 0; i < width; i++) {
+    for (let i = 0; i < height; i++) {
       this._matrix.push(this._createEmptyRow());
     }
 
     this._screen = new TDG.screen.Screen('field-element', {
-      dimensions: [width * this._squareSide, height * this._squareSide],
+      dimensions: [width * this._squareSide + 1, height * this._squareSide + 1],
     });
     this._screen.addLayer('background', new TDG.layers.CanvasLayer);
     this._drawBackground();
-    // this._screen.addLayer('static', new TDG.layers.CanvasLayer);
+    this._screen.addLayer('static', new TDG.layers.CanvasLayer);
     // this._screen.addLayer('dynamic', new TDG.layers.SVGLayer);
   }
 
@@ -41,11 +49,41 @@ class Field {
    * @param {number} y - Y square coordinate.
    */
   fillSquare(x, y) {
-    this._matrix[x][y] = true;
-    if (!this._matrix[x].some(s => !s)) {
-      this._matrix.splice(x, 1);
+    this._matrix[y][x] = true;
+    if (!this._matrix[y].some(s => !s)) {
+      this._matrix.splice(y, 1);
       this._matrix.splice(0, 0, this._createEmptyRow());
+      this._refreshSquaresRectsFill();
+    } else {
+      this._fillSquareRect(x, y);
     }
+  }
+
+  /** Refresh squares rects fill. */
+  _refreshSquaresRectsFill() {
+    this._screen.layers.static.ctx.clearRect(
+        0, 0, this._width * this._squareSide, this._height * this._squareSide
+    );
+    for (let y = 0; y < this._matrix.length; y++) {
+      for (let x = 0; x < this._matrix[y].length; x++) {
+        if (this._matrix[y][x]) {
+          this._fillSquareRect(x, y);
+        }
+      }
+    }
+  }
+
+  /**
+   * Fill square rect.
+   * @param {number} x - X square coordinate.
+   * @param {number} y - Y square coordinate.
+   */
+  _fillSquareRect(x, y) {
+    this._screen.layers.static.ctx.fillStyle = '#5aa897';
+    let rectX = this._squareSide * x + 1;
+    let rectY = this._squareSide * y + 1;
+    let rectSide = this._squareSide - 1;
+    this._screen.layers.static.ctx.fillRect(rectX, rectY, rectSide, rectSide);
   }
 
   /**
@@ -55,7 +93,7 @@ class Field {
    */
   _createEmptyRow() {
     let row = [];
-    for (let i = 0; i < this._height; i++) {
+    for (let i = 0; i < this._width; i++) {
       row.push(false);
     }
     return row;
@@ -73,15 +111,26 @@ class Field {
    * @private
    */
   _drawBackground() {
-    this._screen.layers.background.ctx.strokeStyle = '#333333';
-    for (let i = 0; i < this._width; i++) {
-      for (let j = 0; j < this._height; j++) {
-        let x = this._squareSide * i;
-        let y = this._squareSide * j;
-        this._screen.layers.background.ctx.rect(x, y, this._squareSide, this._squareSide);
-        this._screen.layers.background.ctx.stroke();
-      }
+    this._screen.layers.background.ctx.fillStyle = '#f8f5f1';
+    this._screen.layers.background.ctx.fillRect(
+        0, 0, this._width * this._squareSide + 1, this._height * this._squareSide + 1
+    );
+
+    this._screen.layers.background.ctx.strokeStyle = '#45526c';
+    this._screen.layers.background.ctx.beginPath();
+    let maxX = this._width * this._squareSide;
+    let maxY = this._height * this._squareSide;
+    for (let i = 0; i <= this._width; i++) {
+      let x = this._squareSide * i + 0.5;
+      this._screen.layers.background.ctx.moveTo(x, 0);
+      this._screen.layers.background.ctx.lineTo(x, maxY);
     }
+    for (let j = 0; j <= this._height; j++) {
+      let y = this._squareSide * j + 0.5;
+      this._screen.layers.background.ctx.moveTo(0, y);
+      this._screen.layers.background.ctx.lineTo(maxX, y);
+    }
+    this._screen.layers.background.ctx.stroke();
   }
 }
 
