@@ -2,15 +2,14 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 
-/*
-background     #f8f5f1
-background-net #45526c
-solid-items    #5aa897
-movable-items  #f8a488
-*/
-
-
 class Field {
+
+  static COLORS = {
+    background: '#f8f5f1',
+    backgroundNet: '#45526c',
+    solidSquares: '#5aa897',
+    pieceSquares: '#f8a488',
+  };
 
   /**
    * Creation.
@@ -21,6 +20,8 @@ class Field {
     this._width = width;
     this._height = height;
     this._squareSide = 10;
+    this._pieceSquares = [];
+
     this._matrix = [];
     for (let i = 0; i < height; i++) {
       this._matrix.push(this._createEmptyRow());
@@ -32,7 +33,8 @@ class Field {
     this._screen.addLayer('background', new TDG.layers.CanvasLayer);
     this._drawBackground();
     this._screen.addLayer('static', new TDG.layers.CanvasLayer);
-    // this._screen.addLayer('dynamic', new TDG.layers.SVGLayer);
+    this._screen.addLayer('dynamic', new TDG.layers.CanvasLayer);
+    this._addPiece();
   }
 
   /**
@@ -44,46 +46,86 @@ class Field {
   }
 
   /**
+   * Add piece.
+   * @private
+   */
+  _addPiece() {
+    this._pieceSquares = [
+      {x: 4, y: 0},
+    ];
+    for (let square of this._pieceSquares) {
+      this._fillPieceSquaresRect(square.x, square.y)
+    }
+  }
+
+  /**
    * Fill square.
    * @param {number} x - X square coordinate.
    * @param {number} y - Y square coordinate.
+   * @private
    */
-  fillSquare(x, y) {
+  _fillSquare(x, y) {
     this._matrix[y][x] = true;
     if (!this._matrix[y].some(s => !s)) {
       this._matrix.splice(y, 1);
       this._matrix.splice(0, 0, this._createEmptyRow());
-      this._refreshSquaresRectsFill();
+      this._refreshSolidSquares();
     } else {
-      this._fillSquareRect(x, y);
+      this._fillSolidSquaresRect(x, y);
     }
   }
 
-  /** Refresh squares rects fill. */
-  _refreshSquaresRectsFill() {
+  /**
+   * Refresh solid squares rects fill.
+   * @private
+   */
+  _refreshSolidSquares() {
     this._screen.layers.static.ctx.clearRect(
         0, 0, this._width * this._squareSide, this._height * this._squareSide
     );
     for (let y = 0; y < this._matrix.length; y++) {
       for (let x = 0; x < this._matrix[y].length; x++) {
         if (this._matrix[y][x]) {
-          this._fillSquareRect(x, y);
+          this._fillSolidSquaresRect(x, y);
         }
       }
     }
   }
 
   /**
+   * Fill solid square rect.
+   * @param {number} x - X square coordinate.
+   * @param {number} y - Y square coordinate.
+   * @private
+   */
+  _fillSolidSquaresRect(x, y) {
+    this._fillSquareRect(x, y, this._screen.layers.static, Field.COLORS.solidSquares);
+  }
+
+  /**
+   * Fill piece square rect.
+   * @param {number} x - X square coordinate.
+   * @param {number} y - Y square coordinate.
+   * @private
+   */
+  _fillPieceSquaresRect(x, y) {
+    this._fillSquareRect(x, y, this._screen.layers.dynamic, Field.COLORS.pieceSquares);
+  }
+
+  /**
    * Fill square rect.
    * @param {number} x - X square coordinate.
    * @param {number} y - Y square coordinate.
+   * @param {TDG.layers.CanvasLayer} layer - Layer.
+   * @param {color} color - Fill color.
+   * @private
    */
-  _fillSquareRect(x, y) {
-    this._screen.layers.static.ctx.fillStyle = '#5aa897';
+  _fillSquareRect(x, y, layer, color) {
+    layer.ctx.fillStyle = color;
     let rectX = this._squareSide * x + 1;
     let rectY = this._squareSide * y + 1;
     let rectSide = this._squareSide - 1;
-    this._screen.layers.static.ctx.fillRect(rectX, rectY, rectSide, rectSide);
+    layer.ctx.fillRect(rectX, rectY, rectSide, rectSide);
   }
 
   /**
@@ -111,12 +153,12 @@ class Field {
    * @private
    */
   _drawBackground() {
-    this._screen.layers.background.ctx.fillStyle = '#f8f5f1';
+    this._screen.layers.background.ctx.fillStyle = Field.COLORS.background;
     this._screen.layers.background.ctx.fillRect(
         0, 0, this._width * this._squareSide + 1, this._height * this._squareSide + 1
     );
 
-    this._screen.layers.background.ctx.strokeStyle = '#45526c';
+    this._screen.layers.background.ctx.strokeStyle = Field.COLORS.backgroundNet;
     this._screen.layers.background.ctx.beginPath();
     let maxX = this._width * this._squareSide;
     let maxY = this._height * this._squareSide;
