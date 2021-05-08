@@ -21,6 +21,7 @@ class Field {
     this._height = height;
     this._squareSide = 10;
     this._pieceSquares = [];
+    this._pieceInterval = null;
 
     this._matrix = [];
     for (let i = 0; i < height; i++) {
@@ -38,14 +39,6 @@ class Field {
   }
 
   /**
-   * Get matrix.
-   * @returns {boolean[][]} Matrix.
-   */
-  get matrix() {
-    return this._matrix;
-  }
-
-  /**
    * Add piece.
    * @private
    */
@@ -53,9 +46,60 @@ class Field {
     this._pieceSquares = [
       {x: 4, y: 0},
     ];
-    for (let square of this._pieceSquares) {
-      this._fillPieceSquaresRect(square.x, square.y)
+    this._refreshPieceSquares();
+    this._pieceInterval = setInterval(() => {
+      this._movePiece({y: 1});
+    }, 1000);
+  }
+
+  /**
+   * Move piece.
+   * @param {Object} delta - Delta.
+   * @param {number} [delta.x=0] - X direction delta.
+   * @param {number} [delta.y=0] - Y direction delta.
+   * @private
+   */
+  _movePiece(delta) {
+    if (this._pieceSquares.length === 0) return;
+
+    delta = {x: 0, y: 0, ...delta};
+    let pieceSquaresDump = JSON.stringify(this._pieceSquares);
+
+    if (delta.x !== 0) {
+      for (let s of this._pieceSquares) {
+        s.x += delta.x;
+        if (s.x < 0 || s.x >= this._width || this._matrix[s.y][s.x]) {
+          this._pieceSquares = JSON.parse(pieceSquaresDump);
+          return;
+        }
+      }
     }
+
+    if (delta.y > 0) {
+      for (let s of this._pieceSquares) {
+        s.y += delta.y;
+        if (s.y >= this._height || this._matrix[s.y][s.x]) {
+          this._pieceSquares = JSON.parse(pieceSquaresDump);
+          this._fixPiecePlacement();
+          return;
+        }
+      }
+    }
+
+    this._refreshPieceSquares();
+  }
+
+  /**
+   * Fix piece placement.
+   * @private
+   */
+  _fixPiecePlacement() {
+    clearInterval(this._pieceInterval);
+    for (let square of this._pieceSquares) {
+      this._fillSquare(square.x, square.y);
+    }
+    this._pieceSquares = [];
+    this._refreshPieceSquares();
   }
 
   /**
@@ -76,13 +120,22 @@ class Field {
   }
 
   /**
+   * Refresh piece squares rects fill.
+   * @private
+   */
+  _refreshPieceSquares() {
+    this._cleanLayerSquares(this._screen.layers.dynamic);
+    for (let square of this._pieceSquares) {
+      this._fillPieceSquaresRect(square.x, square.y);
+    }
+  }
+
+  /**
    * Refresh solid squares rects fill.
    * @private
    */
   _refreshSolidSquares() {
-    this._screen.layers.static.ctx.clearRect(
-        0, 0, this._width * this._squareSide, this._height * this._squareSide
-    );
+    this._cleanLayerSquares(this._screen.layers.static);
     for (let y = 0; y < this._matrix.length; y++) {
       for (let x = 0; x < this._matrix[y].length; x++) {
         if (this._matrix[y][x]) {
@@ -90,6 +143,15 @@ class Field {
         }
       }
     }
+  }
+
+  /**
+   * Clean layer squares.
+   * @param {TDG.layers.CanvasLayer} layer - Layer.
+   * @private
+   */
+  _cleanLayerSquares(layer) {
+    layer.ctx.clearRect(0, 0, this._width * this._squareSide, this._height * this._squareSide);
   }
 
   /**
@@ -139,13 +201,6 @@ class Field {
       row.push(false);
     }
     return row;
-  }
-
-  /** Show matrix in console. */
-  logMatrix() {
-    for (let row of this._matrix) {
-      console.log(row.map(s => s? 1 : 0));
-    }
   }
 
   /**
