@@ -7,7 +7,7 @@ const source = require('vinyl-source-stream');
 
 
 gulp.task('default', () =>
-  browserify('src/jsx/main.jsx')
+  browserify('src_dev/jsx/main.jsx')
   .transform('babelify', {
     plugins: ['transform-react-jsx']
   })
