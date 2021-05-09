@@ -1,3 +1,100 @@
+/** Tetris field piece. */
+class FieldPiece {
+
+    /**
+     * Creation.
+     * @param {Field} field - Field.
+     */
+    constructor(field) {
+        this._field = field;
+        this._squares = [
+            {x: 4, y: 0},
+        ];
+        this._squaresDump = JSON.stringify(this._squares);
+    }
+
+    /**
+     * Iterator (squares).
+     * @returns {Generator<{x: number, y: number}, void, *>}
+     */
+    *[Symbol.iterator]() {
+        for (let square of this._squares) {
+            yield square;
+        }
+    }
+
+    /**
+     * Move down.
+     * @returns {boolean} Whether move is successful or not.
+     * @private
+     */
+    moveDown() {
+        this._dumpSquares();
+        for (let s of this) {
+            s.y++;
+            if (s.y >= this._field.height || !this._field.isSquareFree(s.x, s.y)) {
+                this._loadSquares();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Move left.
+     * @returns {boolean} Whether move is successful or not.
+     * @private
+     */
+    _moveLeft() {
+        return this._moveHorizontally(-1);
+    }
+
+    /**
+     * Move right.
+     * @returns {boolean} Whether move is successful or not.
+     * @private
+     */
+    _moveRight() {
+        return this._moveHorizontally(1);
+    }
+
+    /**
+     * Move horizontally.
+     * @param {number} n - Number of squares piece move to.
+     * @returns {boolean} Whether move is successful or not.
+     * @private
+     */
+    _moveHorizontally(n) {
+        this._dumpSquares();
+        for (let s of this) {
+            s.x += n;
+            if (s.x < 0 || s.x >= this._field.width || !this._field.isSquareFree(s.x, s.y)) {
+                this._loadSquares();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Dump squares.
+     * @private
+     */
+    _dumpSquares() {
+        this._squaresDump = JSON.stringify(this._squares);
+    }
+
+    /**
+     * Loads squares.
+     * @private
+     */
+    _loadSquares() {
+        this._squares = JSON.parse(this._squaresDump);
+    }
+}
+
+
+/** Tetris field. */
 class Field {
 
     static COLORS = {
@@ -16,8 +113,7 @@ class Field {
         this._width = width;
         this._height = height;
         this._squareSide = 10;
-        this._pieceSquares = [];
-        this._pieceSquaresDump = JSON.stringify(this._pieceSquares);
+        this._piece = null;
         this._pieceInterval = null;
 
         this._matrix = [];
@@ -36,83 +132,45 @@ class Field {
     }
 
     /**
+     * Width.
+     * @returns {number}
+     */
+    get width() {
+        return this._width;
+    }
+
+    /**
+     * Height.
+     * @returns {number}
+     */
+    get height() {
+        return this._height;
+    }
+
+    /**
+     * Check whether square is free or not.
+     * @param {number} x - X square coordinate.
+     * @param {number} y - Y square coordinate.
+     * @returns {boolean} Check result.
+     */
+    isSquareFree(x, y) {
+        return !this._matrix[y][x];
+    }
+
+    /**
      * Add piece.
      * @private
      */
     _addPiece() {
-        this._pieceSquares = [
-            {x: 4, y: 0},
-        ];
+        this._piece = new FieldPiece(this);
         this._refreshPieceSquares();
         this._pieceInterval = setInterval(() => {
-            this._movePieceDown();
-        }, 1000);
-    }
-
-    /**
-     * Move piece down.
-     * @private
-     */
-    _movePieceDown() {
-        this._dumpPieceSquares();
-        for (let s of this._pieceSquares) {
-            s.y++;
-            if (s.y >= this._height || this._matrix[s.y][s.x]) {
-                this._loadPieceSquares();
+            if (this._piece.moveDown()) {
+                this._refreshPieceSquares();
+            } else {
                 this._fixPiecePlacement();
-                return;
             }
-        }
-        this._refreshPieceSquares();
-    }
-
-    /**
-     * Move piece left.
-     * @private
-     */
-    _movePieceLeft() {
-        this._movePieceHorizontally(-1);
-    }
-
-    /**
-     * Move piece right.
-     * @private
-     */
-    _movePieceRight() {
-        this._movePieceHorizontally(1);
-    }
-
-    /**
-     * Move piece horizontally.
-     * @param {number} n - Number of squares piece move to.
-     * @private
-     */
-    _movePieceHorizontally(n) {
-        this._dumpPieceSquares();
-        for (let s of this._pieceSquares) {
-            s.x += n;
-            if (s.x < 0 || s.x >= this._width || this._matrix[s.y][s.x]) {
-                this._loadPieceSquares();
-                return;
-            }
-        }
-        this._refreshPieceSquares();
-    }
-
-    /**
-     * Dump piece squares.
-     * @private
-     */
-    _dumpPieceSquares() {
-        this._pieceSquaresDump = JSON.stringify(this._pieceSquares);
-    }
-
-    /**
-     * Loads piece squares.
-     * @private
-     */
-    _loadPieceSquares() {
-        this._pieceSquares = JSON.parse(this._pieceSquaresDump);
+        }, 1000);
     }
 
     /**
@@ -121,10 +179,10 @@ class Field {
      */
     _fixPiecePlacement() {
         clearInterval(this._pieceInterval);
-        for (let square of this._pieceSquares) {
+        for (let square of this._piece || []) {
             this._fillSquare(square.x, square.y);
         }
-        this._pieceSquares = [];
+        this._piece = null;
         this._refreshPieceSquares();
     }
 
@@ -151,7 +209,7 @@ class Field {
      */
     _refreshPieceSquares() {
         this._cleanLayerSquares(this._screen.layers.dynamic);
-        for (let square of this._pieceSquares) {
+        for (let square of this._piece) {
             this._fillPieceSquaresRect(square.x, square.y);
         }
     }
@@ -256,6 +314,7 @@ class Field {
         this._screen.layers.background.ctx.stroke();
     }
 }
+
 
 module.exports = {
     Field: Field,
