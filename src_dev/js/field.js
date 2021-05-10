@@ -45,7 +45,7 @@ class FieldPiece {
      * @returns {boolean} Whether move is successful or not.
      * @private
      */
-    _moveLeft() {
+    moveLeft() {
         return this._moveHorizontally(-1);
     }
 
@@ -54,7 +54,7 @@ class FieldPiece {
      * @returns {boolean} Whether move is successful or not.
      * @private
      */
-    _moveRight() {
+    moveRight() {
         return this._moveHorizontally(1);
     }
 
@@ -104,6 +104,12 @@ class Field {
         pieceSquares: '#f8a488',
     };
 
+    static KEYDOWN_HANDLERS = {
+        ArrowLeft: '_movePieceLeft',
+        ArrowRight: '_movePieceRight',
+        ArrowDown: '_movePieceDown',
+    }
+
     /**
      * Creation.
      * @param {number} width - Field width.
@@ -129,6 +135,12 @@ class Field {
         this._screen.addLayer('static', new TDG.layers.CanvasLayer);
         this._screen.addLayer('dynamic', new TDG.layers.CanvasLayer);
         this._addPiece();
+
+        document.addEventListener('keydown', (e) => {
+            let handler = Field.KEYDOWN_HANDLERS[e.code];
+            if (!handler) return;
+            this[handler]();
+        });
     }
 
     /**
@@ -162,15 +174,47 @@ class Field {
      * @private
      */
     _addPiece() {
+        if (this._piece) return;
         this._piece = new FieldPiece(this);
         this._refreshPieceSquares();
         this._pieceInterval = setInterval(() => {
-            if (this._piece.moveDown()) {
-                this._refreshPieceSquares();
-            } else {
-                this._fixPiecePlacement();
-            }
+            this._movePieceDown();
         }, 1000);
+    }
+
+    /**
+     * Move piece down.
+     * @private
+     */
+    _movePieceDown() {
+        if (!this._piece) return;
+        if (this._piece.moveDown()) {
+            this._refreshPieceSquares();
+        } else {
+            this._fixPiecePlacement();
+        }
+    }
+
+    /**
+     * Move piece left.
+     * @private
+     */
+    _movePieceLeft() {
+        if (!this._piece) return;
+        if (this._piece.moveLeft()) {
+            this._refreshPieceSquares();
+        }
+    }
+
+    /**
+     * Move piece right.
+     * @private
+     */
+    _movePieceRight() {
+        if (!this._piece) return;
+        if (this._piece.moveRight()) {
+            this._refreshPieceSquares();
+        }
     }
 
     /**
@@ -209,7 +253,7 @@ class Field {
      */
     _refreshPieceSquares() {
         this._cleanLayerSquares(this._screen.layers.dynamic);
-        for (let square of this._piece) {
+        for (let square of this._piece || []) {
             this._fillPieceSquaresRect(square.x, square.y);
         }
     }
