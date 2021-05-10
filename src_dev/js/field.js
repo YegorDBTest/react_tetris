@@ -108,7 +108,7 @@ class Field {
         ArrowLeft: '_movePieceLeft',
         ArrowRight: '_movePieceRight',
         ArrowDown: '_movePieceDown',
-    }
+    };
 
     /**
      * Creation.
@@ -121,6 +121,7 @@ class Field {
         this._squareSide = 10;
         this._piece = null;
         this._pieceInterval = null;
+        this._end = false;
 
         this._matrix = [];
         for (let i = 0; i < height; i++) {
@@ -174,7 +175,7 @@ class Field {
      * @private
      */
     _addPiece() {
-        if (this._piece) return;
+        if (this._piece || this._end) return;
         this._piece = new FieldPiece(this);
         this._refreshPieceSquares();
         this._pieceInterval = setInterval(() => {
@@ -225,9 +226,11 @@ class Field {
         clearInterval(this._pieceInterval);
         for (let square of this._piece || []) {
             this._fillSquare(square.x, square.y);
+            if (square.y === 0) this._end = true;
         }
         this._piece = null;
         this._refreshPieceSquares();
+        this._addPiece();
     }
 
     /**
