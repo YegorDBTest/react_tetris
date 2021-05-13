@@ -18,81 +18,199 @@ class FieldPiece {
         FieldPiece.TYPE_O,
     ];
 
-    static TYPES_SQUARES = {
-        /*
-             .. .. .. ..   .. ## .. ..
-             .. .. .. ..   .. ## .. ..
-             ## ## ## ##   .. ## .. ..
-             .. .. .. ..   .. ## .. ..
-         */
+    /**
+     *   .. .. .. ..
+     *   .. .. .. ..
+     *   ## ## ## ##
+     *   .. .. .. ..
+     */
+    static SUBTYPE_I_1 = 'I_1';
+    /**
+     *   .. ## .. ..
+     *   .. ## .. ..
+     *   .. ## .. ..
+     *   .. ## .. ..
+     */
+    static SUBTYPE_I_2 = 'I_2';
+    /**
+     *   .. ## ##
+     *   .. ## ..
+     *   .. ## ..
+     */
+    static SUBTYPE_J_1 = 'J_1';
+    /**
+     *   ## .. ..
+     *   ## ## ##
+     *   .. .. ..
+     */
+    static SUBTYPE_J_2 = 'J_2';
+    /**
+     *   .. ## ..
+     *   .. ## ..
+     *   ## ## ..
+     */
+    static SUBTYPE_J_3 = 'J_3';
+    /**
+     *   .. .. ..
+     *   ## ## ##
+     *   .. .. ##
+     */
+    static SUBTYPE_J_4 = 'J_4';
+    /**
+     *   ## ## ..
+     *   .. ## ..
+     *   .. ## ..
+     */
+    static SUBTYPE_L_1 = 'L_1';
+    /**
+     *   .. .. ..
+     *   ## ## ##
+     *   ## .. ..
+     */
+    static SUBTYPE_L_2 = 'L_2';
+    /**
+     *   .. ## ..
+     *   .. ## ..
+     *   .. ## ##
+     */
+    static SUBTYPE_L_3 = 'L_3';
+    /**
+     *   .. .. ##
+     *   ## ## ##
+     *   .. .. ..
+     */
+    static SUBTYPE_L_4 = 'L_4';
+    /**
+     *   .. ## ..
+     *   .. ## ##
+     *   .. ## ..
+     */
+    static SUBTYPE_T_1 = 'T_1';
+    /**
+     *   .. ## ..
+     *   ## ## ##
+     *   .. .. ..
+     */
+    static SUBTYPE_T_2 = 'T_2';
+    /**
+     *   .. ## ..
+     *   ## ## ..
+     *   .. ## ..
+     */
+    static SUBTYPE_T_3 = 'T_3';
+    /**
+     *   .. .. ..
+     *   ## ## ##
+     *   .. ## ..
+     */
+    static SUBTYPE_T_4 = 'T_4';
+    /**
+     *   .. .. ..
+     *   .. ## ##
+     *   ## ## ..
+     */
+    static SUBTYPE_S_1 = 'S_1';
+    /**
+     *   .. ## ..
+     *   .. ## ##
+     *   .. .. ##
+     */
+    static SUBTYPE_S_2 = 'S_2';
+    /**
+     *   .. .. ..
+     *   ## ## ..
+     *   .. ## ##
+     */
+    static SUBTYPE_Z_1 = 'Z_1';
+    /**
+     *   .. .. ##
+     *   .. ## ##
+     *   .. ## ..
+     */
+    static SUBTYPE_Z_2 = 'Z_2';
+    /**
+     *   ## ##
+     *   ## ##
+     */
+    static SUBTYPE_O_1 = 'O_1';
+
+    static SUBTYPES = {
         [FieldPiece.TYPE_I]: [
-            [{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}],
-            [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}],
+            FieldPiece.SUBTYPE_I_1,
+            FieldPiece.SUBTYPE_I_2,
         ],
-
-        /*
-             .. ## ##   ## .. ..   .. ## ..   .. .. ..
-             .. ## ..   ## ## ##   .. ## ..   ## ## ##
-             .. ## ..   .. .. ..   ## ## ..   .. .. ##
-         */
         [FieldPiece.TYPE_J]: [
-            [{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}],
-            [{x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
-            [{x: 1, y: 0}, {x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
-            [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}],
+            FieldPiece.SUBTYPE_J_1,
+            FieldPiece.SUBTYPE_J_2,
+            FieldPiece.SUBTYPE_J_3,
+            FieldPiece.SUBTYPE_J_4,
         ],
-
-        /*
-             ## ## ..   .. .. ..   .. ## ..   .. .. ##
-             .. ## ..   ## ## ##   .. ## ..   ## ## ##
-             .. ## ..   ## .. ..   .. ## ##   .. .. ..
-         */
         [FieldPiece.TYPE_L]: [
-            [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}],
-            [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}],
-            [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}],
-            [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+            FieldPiece.SUBTYPE_L_1,
+            FieldPiece.SUBTYPE_L_2,
+            FieldPiece.SUBTYPE_L_3,
+            FieldPiece.SUBTYPE_L_4,
         ],
-
-        /*
-             .. ## ..   .. ## ..   .. ## ..   .. .. ..
-             .. ## ##   ## ## ##   ## ## ..   ## ## ##
-             .. ## ..   .. .. ..   .. ## ..   .. ## ..
-         */
         [FieldPiece.TYPE_T]: [
-            [{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
-            [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
-            [{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}],
-            [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+            FieldPiece.SUBTYPE_T_1,
+            FieldPiece.SUBTYPE_T_2,
+            FieldPiece.SUBTYPE_T_3,
+            FieldPiece.SUBTYPE_T_4,
         ],
-
-        /*
-             .. .. ..   .. ## ..
-             .. ## ##   .. ## ##
-             ## ## ..   .. .. ##
-         */
         [FieldPiece.TYPE_S]: [
-            [{x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
-            [{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}],
+            FieldPiece.SUBTYPE_S_1,
+            FieldPiece.SUBTYPE_S_2,
         ],
-
-        /*
-             .. .. ..   .. .. ##
-             ## ## ..   .. ## ##
-             .. ## ##   .. ## ..
-         */
         [FieldPiece.TYPE_Z]: [
-            [{x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}],
-            [{x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 1}],
+            FieldPiece.SUBTYPE_Z_1,
+            FieldPiece.SUBTYPE_Z_2,
         ],
-
-        /*
-             ## ##
-             ## ##
-         */
         [FieldPiece.TYPE_O]: [
-            [{x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+            FieldPiece.SUBTYPE_O_1,
         ],
+    };
+
+    static SUBTYPES_SQUARES = {
+        [FieldPiece.SUBTYPE_I_1]: [{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}],
+        [FieldPiece.SUBTYPE_I_2]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}],
+        [FieldPiece.SUBTYPE_J_1]: [{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_J_2]: [{x: 0, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+        [FieldPiece.SUBTYPE_J_3]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_J_4]: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}],
+        [FieldPiece.SUBTYPE_L_1]: [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_L_2]: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}],
+        [FieldPiece.SUBTYPE_L_3]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}],
+        [FieldPiece.SUBTYPE_L_4]: [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+        [FieldPiece.SUBTYPE_T_1]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_T_2]: [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+        [FieldPiece.SUBTYPE_T_3]: [{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_T_4]: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_S_1]: [{x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_S_2]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 2, y: 2}],
+        [FieldPiece.SUBTYPE_Z_1]: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}],
+        [FieldPiece.SUBTYPE_Z_2]: [{x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+        [FieldPiece.SUBTYPE_O_1]: [{x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
+    };
+    static SUBTYPES_INITIAL_SQUARES = {
+        [FieldPiece.SUBTYPE_I_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_I_2]: {x: 4, y: -3},
+        [FieldPiece.SUBTYPE_J_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_J_2]: {x: 3, y: -1},
+        [FieldPiece.SUBTYPE_J_3]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_J_4]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_L_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_L_2]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_L_3]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_L_4]: {x: 3, y: -1},
+        [FieldPiece.SUBTYPE_T_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_T_2]: {x: 3, y: -1},
+        [FieldPiece.SUBTYPE_T_3]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_T_4]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_S_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_S_2]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_Z_1]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_Z_2]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_O_1]: {x: 4, y: -1},
     };
 
     /**
