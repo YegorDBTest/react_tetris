@@ -219,9 +219,13 @@ class FieldPiece {
      */
     constructor(field) {
         this._field = field;
-        this._squares = [
-            {x: 4, y: 0},
-        ];
+        this._type = FieldPiece.ALL_TYPES[Math.floor(Math.random() * FieldPiece.ALL_TYPES.length)];
+        let subtypes = FieldPiece.SUBTYPES[this._type];
+        this._subtype = subtypes[Math.floor(Math.random() * subtypes.length)];
+        let initial = FieldPiece.SUBTYPES_INITIAL_SQUARES[this._subtype];
+        this._squares = FieldPiece.SUBTYPES_SQUARES[this._subtype].map(s => {
+            return {x: initial.x + s.x, y: initial.y + s.y};
+        });
         this._squaresDump = JSON.stringify(this._squares);
     }
 
@@ -230,7 +234,7 @@ class FieldPiece {
      * @returns {Generator<{x: number, y: number}, void, *>}
      */
     *[Symbol.iterator]() {
-        for (let square of this._squares) {
+        for (let square of this._squares.filter(s => s.y >= 0)) {
             yield square;
         }
     }
@@ -242,8 +246,9 @@ class FieldPiece {
      */
     moveDown() {
         this._dumpSquares();
-        for (let s of this) {
+        for (let s of this._squares) {
             s.y++;
+            if (s.y < 0) continue;
             if (s.y >= this._field.height || !this._field.isSquareFree(s.x, s.y)) {
                 this._loadSquares();
                 return false;
@@ -278,8 +283,9 @@ class FieldPiece {
      */
     _moveHorizontally(n) {
         this._dumpSquares();
-        for (let s of this) {
+        for (let s of this._squares) {
             s.x += n;
+            if (s.y < 0) continue;
             if (s.x < 0 || s.x >= this._field.width || !this._field.isSquareFree(s.x, s.y)) {
                 this._loadSquares();
                 return false;
