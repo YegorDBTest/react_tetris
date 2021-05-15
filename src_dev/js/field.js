@@ -220,23 +220,36 @@ class FieldPiece {
     constructor(field) {
         this._field = field;
         this._type = FieldPiece.ALL_TYPES[Math.floor(Math.random() * FieldPiece.ALL_TYPES.length)];
-        let subtypes = FieldPiece.SUBTYPES[this._type];
-        this._subtype = subtypes[Math.floor(Math.random() * subtypes.length)];
-        let initial = FieldPiece.SUBTYPES_INITIAL_SQUARES[this._subtype];
-        this._squares = FieldPiece.SUBTYPES_SQUARES[this._subtype].map(s => {
-            return {x: initial.x + s.x, y: initial.y + s.y};
-        });
-        this._squaresDump = JSON.stringify(this._squares);
+        this._subtypeIndex = Math.floor(Math.random() * this.subtypesGroup.length);
+        let angleSquareTemplate = FieldPiece.SUBTYPES_INITIAL_SQUARES[this.subtype];
+        this._angleSquare = {x: angleSquareTemplate.x, y: angleSquareTemplate.y};
+        this._squares = this._getSquares() || [];
     }
 
     /**
-     * Iterator (squares).
-     * @returns {Generator<{x: number, y: number}, void, *>}
+     * Iterator.
+     * @returns {Generator} Piece squares.
      */
     *[Symbol.iterator]() {
-        for (let square of this._squares.filter(s => s.y >= 0)) {
+        for (let square of this._squares) {
             yield square;
         }
+    }
+
+    /**
+     * Subtype.
+     * @returns {string}
+     */
+    get subtype() {
+        return this.subtypesGroup[this._subtypeIndex];
+    }
+
+    /**
+     * Subtypes group.
+     * @returns {string[]}
+     */
+    get subtypesGroup() {
+        return FieldPiece.SUBTYPES[this._type];
     }
 
     /**
@@ -245,16 +258,7 @@ class FieldPiece {
      * @private
      */
     moveDown() {
-        this._dumpSquares();
-        for (let s of this._squares) {
-            s.y++;
-            if (s.y < 0) continue;
-            if (s.y >= this._field.height || !this._field.isSquareFree(s.x, s.y)) {
-                this._loadSquares();
-                return false;
-            }
-        }
-        return true;
+        return this._move({y: 1});
     }
 
     /**
@@ -263,7 +267,7 @@ class FieldPiece {
      * @private
      */
     moveLeft() {
-        return this._moveHorizontally(-1);
+        return this._move({x: -1});
     }
 
     /**
@@ -272,42 +276,51 @@ class FieldPiece {
      * @private
      */
     moveRight() {
-        return this._moveHorizontally(1);
+        return this._move({x: 1});
     }
 
     /**
-     * Move horizontally.
-     * @param {number} n - Number of squares piece move to.
+     * Move.
+     * @param {Object} delta - Number of squares piece move to.
+     * @param {number} [delta.x=0] - Number of x squares piece move to.
+     * @param {number} [delta.y=0] - Number of y squares piece move to.
      * @returns {boolean} Whether move is successful or not.
      * @private
      */
-    _moveHorizontally(n) {
-        this._dumpSquares();
-        for (let s of this._squares) {
-            s.x += n;
-            if (s.y < 0) continue;
-            if (s.x < 0 || s.x >= this._field.width || !this._field.isSquareFree(s.x, s.y)) {
-                this._loadSquares();
-                return false;
-            }
+    _move(delta) {
+        delta = {x: 0, y: 0, ...delta};
+        this._angleSquare.x += delta.x;
+        this._angleSquare.y += delta.y;
+        let newSquares = this._getSquares();
+        if (!newSquares) {
+            this._angleSquare.x -= delta.x;
+            this._angleSquare.y -= delta.y;
+            return false;
         }
+        this._squares = newSquares;
         return true;
     }
 
     /**
-     * Dump squares.
+     * Get squares.
+     * @returns {null|Object[]}
      * @private
      */
-    _dumpSquares() {
-        this._squaresDump = JSON.stringify(this._squares);
-    }
-
-    /**
-     * Loads squares.
-     * @private
-     */
-    _loadSquares() {
-        this._squares = JSON.parse(this._squaresDump);
+    _getSquares() {
+        let result = [];
+        for (let square of FieldPiece.SUBTYPES_SQUARES[this.subtype]) {
+            let s = {
+                x: square.x + this._angleSquare.x,
+                y: square.y + this._angleSquare.y,
+            };
+            if (s.y < 0) continue;
+            let outOfTheField = s.x < 0 || s.x >= this._field.width || s.y >= this._field.height;
+            if (outOfTheField || !this._field.isSquareFree(s.x, s.y)) {
+                return null;
+            }
+            result.push(s);
+        }
+        return result;
     }
 }
 
