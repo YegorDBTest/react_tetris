@@ -182,7 +182,7 @@ class FieldPiece {
         [FieldPiece.SUBTYPE_L_3]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 2, y: 2}],
         [FieldPiece.SUBTYPE_L_4]: [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
         [FieldPiece.SUBTYPE_T_1]: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
-        [FieldPiece.SUBTYPE_T_2]: [{x: 2, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
+        [FieldPiece.SUBTYPE_T_2]: [{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}],
         [FieldPiece.SUBTYPE_T_3]: [{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}],
         [FieldPiece.SUBTYPE_T_4]: [{x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
         [FieldPiece.SUBTYPE_S_1]: [{x: 1, y: 1}, {x: 2, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}],
@@ -253,9 +253,27 @@ class FieldPiece {
     }
 
     /**
+     * Rotate.
+     * @returns {boolean} Whether rotate is successful or not.
+     */
+    rotate() {
+        let latestSubtypeIndex = this._subtypeIndex;
+        this._subtypeIndex++;
+        if (this._subtypeIndex >= this.subtypesGroup.length) {
+            this._subtypeIndex = 0;
+        }
+        let newSquares = this._getSquares();
+        if (!newSquares) {
+            this._subtypeIndex = latestSubtypeIndex;
+            return false;
+        }
+        this._squares = newSquares;
+        return true;
+    }
+
+    /**
      * Move down.
      * @returns {boolean} Whether move is successful or not.
-     * @private
      */
     moveDown() {
         return this._move({y: 1});
@@ -264,7 +282,6 @@ class FieldPiece {
     /**
      * Move left.
      * @returns {boolean} Whether move is successful or not.
-     * @private
      */
     moveLeft() {
         return this._move({x: -1});
@@ -273,7 +290,6 @@ class FieldPiece {
     /**
      * Move right.
      * @returns {boolean} Whether move is successful or not.
-     * @private
      */
     moveRight() {
         return this._move({x: 1});
@@ -339,6 +355,7 @@ class Field {
         ArrowLeft: '_movePieceLeft',
         ArrowRight: '_movePieceRight',
         ArrowDown: '_movePieceDown',
+        Space: '_rotatePiece',
     };
 
     /**
@@ -412,6 +429,13 @@ class Field {
         this._pieceInterval = setInterval(() => {
             this._movePieceDown();
         }, 1000);
+    }
+
+    _rotatePiece() {
+        if (!this._piece) return;
+        if (this._piece.rotate()) {
+            this._refreshPieceSquares();
+        }
     }
 
     /**
