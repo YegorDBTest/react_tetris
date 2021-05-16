@@ -351,6 +351,13 @@ class Field {
         pieceSquares: '#f8a488',
     };
 
+    static POINTS_BY_LINES = {
+        1: 100,
+        2: 300,
+        3: 700,
+        4: 1500,
+    };
+
     static KEYDOWN_HANDLERS = {
         ArrowLeft: '_movePieceLeft',
         ArrowRight: '_movePieceRight',
@@ -369,6 +376,8 @@ class Field {
         this._squareSide = 10;
         this._piece = null;
         this._pieceInterval = null;
+        this._points = 0;
+        this._removedLinesCount = 0;
         this._end = false;
 
         this._matrix = [];
@@ -483,9 +492,25 @@ class Field {
             this._fillSquare(square.x, square.y);
             if (square.y === 0) this._end = true;
         }
+        this._addPoints();
         this._piece = null;
         this._refreshPieceSquares();
         this._addPiece();
+    }
+
+    /**
+     * Add points.
+     * @private
+     */
+    _addPoints() {
+        if (this._removedLinesCount === 0) return;
+        let addition = Field.POINTS_BY_LINES[this._removedLinesCount];
+        this._points += addition;
+        this._removedLinesCount = 0;
+        document.dispatchEvent(new CustomEvent('addPoints', {detail: {
+            points: this._points,
+            addition: addition,
+        }}));
     }
 
     /**
@@ -500,6 +525,7 @@ class Field {
             this._matrix.splice(y, 1);
             this._matrix.splice(0, 0, this._createEmptyRow());
             this._refreshSolidSquares();
+            this._removedLinesCount++;
         } else {
             this._fillSolidSquaresRect(x, y);
         }
