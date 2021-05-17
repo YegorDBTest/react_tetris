@@ -7,11 +7,11 @@ const { Field } = require('../js/field');
 window.field = new Field(10, 20);
 
 
-class HelloMessage extends React.Component {
+class PointsBoard extends React.Component {
   render() {
     return (
       <div>
-        Lol, {this.props.name}
+        Points: {this.props.points}
       </div>
     );
   }
@@ -19,6 +19,14 @@ class HelloMessage extends React.Component {
 
 
 ReactDOM.render(
-  <HelloMessage name="Kek" />,
-  document.getElementById('test')
+  <PointsBoard points="0" />,
+  document.getElementById('points')
 );
+
+
+document.addEventListener('addPoints', (e) => {
+  ReactDOM.render(
+      <PointsBoard points={e.detail.points} />,
+      document.getElementById('points')
+  );
+});
