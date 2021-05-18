@@ -7,11 +7,32 @@ const { Field } = require('../js/field');
 window.field = new Field(10, 20);
 
 
-class PointsBoard extends React.Component {
+class Score extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      points: 0,
+    };
+    this._refreshPoints = (e) => {
+      this.setState({
+        points: e.detail.points,
+      });
+    };
+  }
+
+  componentDidMount() {
+    document.addEventListener('addPoints', this._refreshPoints);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('addPoints', this._refreshPoints);
+  }
+
   render() {
     return (
       <div>
-        Points: {this.props.points}
+        Score: {this.state.points}
       </div>
     );
   }
@@ -19,14 +40,6 @@ class PointsBoard extends React.Component {
 
 
 ReactDOM.render(
-  <PointsBoard points="0" />,
-  document.getElementById('points')
+  <Score />,
+  document.getElementById('score')
 );
-
-
-document.addEventListener('addPoints', (e) => {
-  ReactDOM.render(
-      <PointsBoard points={e.detail.points} />,
-      document.getElementById('points')
-  );
-});
