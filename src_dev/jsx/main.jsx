@@ -4,9 +4,6 @@ const ReactDOM = require('react-dom');
 const { Field } = require('../js/field');
 
 
-window.field = new Field(10, 20);
-
-
 class Score extends React.Component {
 
   constructor(props) {
@@ -39,7 +36,24 @@ class Score extends React.Component {
 }
 
 
+class App extends React.Component {
+
+  componentDidMount() {
+    window.field = new Field(10, 20);
+  }
+
+  render() {
+    return (
+        <div>
+          <Score />
+          <div id="field-element"/>
+        </div>
+    );
+  }
+}
+
+
 ReactDOM.render(
-  <Score />,
-  document.getElementById('score')
+  <App />,
+  document.getElementById('app')
 );
