@@ -47,6 +47,7 @@ class App extends React.Component {
         <div>
           <Score />
           <div id="field-element"/>
+          <div id="preview-element"/>
         </div>
     );
   }

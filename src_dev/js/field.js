@@ -389,9 +389,17 @@ class Field {
             dimensions: [width * this._squareSide + 1, height * this._squareSide + 1],
         });
         this._screen.addLayer('background', new TDG.layers.CanvasLayer);
-        this._drawBackground();
         this._screen.addLayer('static', new TDG.layers.CanvasLayer);
         this._screen.addLayer('dynamic', new TDG.layers.CanvasLayer);
+
+        this._previewScreen = new TDG.screen.Screen('preview-element', {
+            dimensions: [4 * this._squareSide + 1, 4 * this._squareSide + 1],
+        });
+        this._previewScreen.addLayer('background', new TDG.layers.CanvasLayer);
+        this._previewScreen.addLayer('static', new TDG.layers.CanvasLayer);
+
+        this._drawMainBackground();
+        this._drawPreviewBackground();
         this._addPiece();
 
         document.addEventListener('keydown', (e) => {
@@ -616,30 +624,49 @@ class Field {
     }
 
     /**
-     * Draw background.
+     * Draw main background.
      * @private
      */
-    _drawBackground() {
-        this._screen.layers.background.ctx.fillStyle = Field.COLORS.background;
-        this._screen.layers.background.ctx.fillRect(
-            0, 0, this._width * this._squareSide + 1, this._height * this._squareSide + 1
+    _drawMainBackground() {
+        this._drawBackground(this._screen, this._width, this._height);
+    }
+
+    /**
+     * Draw preview background.
+     * @private
+     */
+    _drawPreviewBackground() {
+        this._drawBackground(this._previewScreen, 4, 4);
+    }
+
+    /**
+     * Draw background.
+     * @param {TDG.Screen} screen
+     * @param {number} width
+     * @param {number} height
+     * @private
+     */
+    _drawBackground(screen, width, height) {
+        screen.layers.background.ctx.fillStyle = Field.COLORS.background;
+        screen.layers.background.ctx.fillRect(
+            0, 0, width * this._squareSide + 1, height * this._squareSide + 1
         );
 
-        this._screen.layers.background.ctx.strokeStyle = Field.COLORS.backgroundNet;
-        this._screen.layers.background.ctx.beginPath();
-        let maxX = this._width * this._squareSide;
-        let maxY = this._height * this._squareSide;
-        for (let i = 0; i <= this._width; i++) {
+        screen.layers.background.ctx.strokeStyle = Field.COLORS.backgroundNet;
+        screen.layers.background.ctx.beginPath();
+        let maxX = width * this._squareSide;
+        let maxY = height * this._squareSide;
+        for (let i = 0; i <= width; i++) {
             let x = this._squareSide * i + 0.5;
-            this._screen.layers.background.ctx.moveTo(x, 0);
-            this._screen.layers.background.ctx.lineTo(x, maxY);
+            screen.layers.background.ctx.moveTo(x, 0);
+            screen.layers.background.ctx.lineTo(x, maxY);
         }
-        for (let j = 0; j <= this._height; j++) {
+        for (let j = 0; j <= height; j++) {
             let y = this._squareSide * j + 0.5;
-            this._screen.layers.background.ctx.moveTo(0, y);
-            this._screen.layers.background.ctx.lineTo(maxX, y);
+            screen.layers.background.ctx.moveTo(0, y);
+            screen.layers.background.ctx.lineTo(maxX, y);
         }
-        this._screen.layers.background.ctx.stroke();
+        screen.layers.background.ctx.stroke();
     }
 }
 
