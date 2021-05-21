@@ -253,6 +253,14 @@ class FieldPiece {
     }
 
     /**
+     * Subtype squares.
+     * @returns {Object[]}
+     */
+    get subtypeSquares() {
+        return FieldPiece.SUBTYPES_SQUARES[this.subtype];
+    }
+
+    /**
      * Rotate.
      * @returns {boolean} Whether rotate is successful or not.
      */
@@ -324,7 +332,7 @@ class FieldPiece {
      */
     _getSquares() {
         let result = [];
-        for (let square of FieldPiece.SUBTYPES_SQUARES[this.subtype]) {
+        for (let square of this.subtypeSquares) {
             let s = {
                 x: square.x + this._angleSquare.x,
                 y: square.y + this._angleSquare.y,
@@ -375,6 +383,7 @@ class Field {
         this._height = height;
         this._squareSide = 10;
         this._piece = null;
+        this._nextPiece = null;
         this._pieceInterval = null;
         this._points = 0;
         this._removedLinesCount = 0;
@@ -441,8 +450,10 @@ class Field {
      */
     _addPiece() {
         if (this._piece || this._end) return;
-        this._piece = new FieldPiece(this);
+        this._piece = this._nextPiece || new FieldPiece(this);
+        this._nextPiece = new FieldPiece(this);
         this._refreshPieceSquares();
+        this._refreshPreviewSquares();
         this._pieceInterval = setInterval(() => {
             this._movePieceDown();
         }, 1000);
@@ -566,12 +577,32 @@ class Field {
     }
 
     /**
-     * Clean layer squares.
-     * @param {TDG.layers.CanvasLayer} layer - Layer.
+     * Refresh preview squares rects fill.
      * @private
      */
-    _cleanLayerSquares(layer) {
-        layer.ctx.clearRect(0, 0, this._width * this._squareSide, this._height * this._squareSide);
+    _refreshPreviewSquares() {
+        this._cleanLayerSquares(this._previewScreen.layers.static, {
+            width: 4,
+            height: 4,
+        });
+        for (let s of this._nextPiece.subtypeSquares) {
+            this._fillPreviewSquaresRect(s.x, s.y);
+        }
+    }
+
+    /**
+     * Clean layer squares.
+     * @param {TDG.layers.CanvasLayer} layer - Layer.
+     * @param {Object} [options] - Options.
+     * @param {number} [options.width] - Width.
+     * @param {number} [options.height] - Height.
+     * @private
+     */
+    _cleanLayerSquares(layer, options) {
+        options = options || {};
+        let width = (options.width || this._width) * this._squareSide;
+        let height = (options.height || this._height) * this._squareSide;
+        layer.ctx.clearRect(0, 0, width, height);
     }
 
     /**
@@ -582,6 +613,16 @@ class Field {
      */
     _fillSolidSquaresRect(x, y) {
         this._fillSquareRect(x, y, this._screen.layers.static, Field.COLORS.solidSquares);
+    }
+
+    /**
+     * Fill preview square rect.
+     * @param {number} x - X square coordinate.
+     * @param {number} y - Y square coordinate.
+     * @private
+     */
+    _fillPreviewSquaresRect(x, y) {
+        this._fillSquareRect(x, y, this._previewScreen.layers.static, Field.COLORS.pieceSquares);
     }
 
     /**
