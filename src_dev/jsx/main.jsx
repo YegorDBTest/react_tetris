@@ -28,7 +28,7 @@ class Score extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="score-element">
         Score: {this.state.points}
       </div>
     );

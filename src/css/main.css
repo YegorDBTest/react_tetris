@@ -1,0 +1,23 @@
+#app > div {
+    position: absolute;
+    width: 146px;
+    height: 261px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#score-element {
+    position: absolute;
+}
+
+#field-element {
+    position: absolute;
+    top: 20px;
+}
+
+#preview-element {
+    position: absolute;
+    top: 20px;
+    left: 105px;
+}

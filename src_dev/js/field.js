@@ -337,9 +337,11 @@ class FieldPiece {
                 x: square.x + this._angleSquare.x,
                 y: square.y + this._angleSquare.y,
             };
+            if (s.x < 0 || s.x >= this._field.width || s.y >= this._field.height) {
+                return null;
+            }
             if (s.y < 0) continue;
-            let outOfTheField = s.x < 0 || s.x >= this._field.width || s.y >= this._field.height;
-            if (outOfTheField || !this._field.isSquareFree(s.x, s.y)) {
+            if (!this._field.isSquareFree(s.x, s.y)) {
                 return null;
             }
             result.push(s);
