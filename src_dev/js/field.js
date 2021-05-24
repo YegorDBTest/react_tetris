@@ -373,6 +373,7 @@ class Field {
         ArrowRight: '_movePieceRight',
         ArrowDown: '_movePieceDown',
         Space: '_rotatePiece',
+        KeyP: '_stopStart',
     };
 
     /**
@@ -389,6 +390,7 @@ class Field {
         this._pieceInterval = null;
         this._points = 0;
         this._removedLinesCount = 0;
+        this._stopped = false;
         this._end = false;
 
         this._matrix = [];
@@ -437,6 +439,14 @@ class Field {
     }
 
     /**
+     * Check whether piece is active or not.
+     * @returns {boolean}
+     */
+    get isPieceActive() {
+        return !!(this._piece && !this._stopped && !this._end);
+    }
+
+    /**
      * Check whether square is free or not.
      * @param {number} x - X square coordinate.
      * @param {number} y - Y square coordinate.
@@ -456,13 +466,11 @@ class Field {
         this._nextPiece = new FieldPiece(this);
         this._refreshPieceSquares();
         this._refreshPreviewSquares();
-        this._pieceInterval = setInterval(() => {
-            this._movePieceDown();
-        }, 1000);
+        this._start();
     }
 
     _rotatePiece() {
-        if (!this._piece) return;
+        if (!this.isPieceActive) return;
         if (this._piece.rotate()) {
             this._refreshPieceSquares();
         }
@@ -473,7 +481,7 @@ class Field {
      * @private
      */
     _movePieceDown() {
-        if (!this._piece) return;
+        if (!this.isPieceActive) return;
         if (this._piece.moveDown()) {
             this._refreshPieceSquares();
         } else {
@@ -486,7 +494,7 @@ class Field {
      * @private
      */
     _movePieceLeft() {
-        if (!this._piece) return;
+        if (!this.isPieceActive) return;
         if (this._piece.moveLeft()) {
             this._refreshPieceSquares();
         }
@@ -497,7 +505,7 @@ class Field {
      * @private
      */
     _movePieceRight() {
-        if (!this._piece) return;
+        if (!this.isPieceActive) return;
         if (this._piece.moveRight()) {
             this._refreshPieceSquares();
         }
@@ -517,6 +525,40 @@ class Field {
         this._piece = null;
         this._refreshPieceSquares();
         this._addPiece();
+    }
+
+    /**
+     * Stop or start.
+     * @private
+     */
+    _stopStart() {
+        if (this._stopped) {
+            this._start();
+        } else {
+            this._stop();
+        }
+    }
+
+    /**
+     * Stop.
+     * @private
+     */
+    _stop() {
+        if (this._end) return;
+        this._stopped = true;
+        clearInterval(this._pieceInterval);
+    }
+
+    /**
+     * Start.
+     * @private
+     */
+    _start() {
+        if (this._end) return;
+        this._stopped = false;
+        this._pieceInterval = setInterval(() => {
+            this._movePieceDown();
+        }, 1000);
     }
 
     /**
