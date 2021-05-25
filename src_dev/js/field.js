@@ -373,7 +373,7 @@ class Field {
         ArrowRight: '_movePieceRight',
         ArrowDown: '_movePieceDown',
         Space: '_rotatePiece',
-        KeyP: '_stopStart',
+        KeyP: '_pausePlay',
     };
 
     /**
@@ -390,7 +390,7 @@ class Field {
         this._pieceInterval = null;
         this._points = 0;
         this._removedLinesCount = 0;
-        this._stopped = false;
+        this._paused = false;
         this._end = false;
 
         this._matrix = [];
@@ -420,6 +420,12 @@ class Field {
             if (!handler) return;
             this[handler]();
         });
+        document.addEventListener('setPlay', (e) => {
+            this._play();
+        });
+        document.addEventListener('setPause', (e) => {
+            this._pause();
+        });
     }
 
     /**
@@ -443,7 +449,7 @@ class Field {
      * @returns {boolean}
      */
     get isPieceActive() {
-        return !!(this._piece && !this._stopped && !this._end);
+        return !!(this._piece && !this._paused && !this._end);
     }
 
     /**
@@ -466,7 +472,7 @@ class Field {
         this._nextPiece = new FieldPiece(this);
         this._refreshPieceSquares();
         this._refreshPreviewSquares();
-        this._start();
+        this._play();
     }
 
     _rotatePiece() {
@@ -528,34 +534,31 @@ class Field {
     }
 
     /**
-     * Stop or start.
+     * Pause or play.
      * @private
      */
-    _stopStart() {
-        if (this._stopped) {
-            this._start();
-        } else {
-            this._stop();
-        }
+    _pausePlay() {
+        let eventName = this._paused ? 'setPlay' : 'setPause';
+        document.dispatchEvent(new CustomEvent(eventName));
     }
 
     /**
-     * Stop.
+     * Pause.
      * @private
      */
-    _stop() {
+    _pause() {
         if (this._end) return;
-        this._stopped = true;
+        this._paused = true;
         clearInterval(this._pieceInterval);
     }
 
     /**
-     * Start.
+     * Play.
      * @private
      */
-    _start() {
+    _play() {
         if (this._end) return;
-        this._stopped = false;
+        this._paused = false;
         this._pieceInterval = setInterval(() => {
             this._movePieceDown();
         }, 1000);
