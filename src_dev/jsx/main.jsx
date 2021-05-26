@@ -55,6 +55,14 @@ class PausePlay extends React.Component {
         paused: false,
       });
     };
+
+    this._clickPlay = (e) => {
+      document.dispatchEvent(new CustomEvent('setPlay'));
+    };
+
+    this._clickPause = (e) => {
+      document.dispatchEvent(new CustomEvent('setPause'));
+    };
   }
 
   componentDidMount() {
@@ -70,9 +78,10 @@ class PausePlay extends React.Component {
   }
 
   render() {
-    let text = this.state.paused ? 'Play' : 'Pause';
     return (
-        <div id="pause-play-element">{text}</div>
+        <div id="pause-play-element"
+             className={this.state.paused ? "paused" : ""}
+             onClick={this.state.paused ? this._clickPlay : this._clickPause} />
     );
   }
 }
