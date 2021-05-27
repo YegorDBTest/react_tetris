@@ -192,25 +192,25 @@ class FieldPiece {
         [FieldPiece.SUBTYPE_O_1]: [{x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}],
     };
     static SUBTYPES_INITIAL_SQUARES = {
-        [FieldPiece.SUBTYPE_I_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_I_2]: {x: 4, y: -3},
-        [FieldPiece.SUBTYPE_J_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_J_2]: {x: 3, y: -1},
-        [FieldPiece.SUBTYPE_J_3]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_J_4]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_L_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_L_2]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_L_3]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_L_4]: {x: 3, y: -1},
-        [FieldPiece.SUBTYPE_T_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_T_2]: {x: 3, y: -1},
-        [FieldPiece.SUBTYPE_T_3]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_T_4]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_S_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_S_2]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_Z_1]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_Z_2]: {x: 3, y: -2},
-        [FieldPiece.SUBTYPE_O_1]: {x: 4, y: -1},
+        [FieldPiece.SUBTYPE_I_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_I_2]: {x: 4, y: -4},
+        [FieldPiece.SUBTYPE_J_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_J_2]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_J_3]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_J_4]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_L_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_L_2]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_L_3]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_L_4]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_T_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_T_2]: {x: 3, y: -2},
+        [FieldPiece.SUBTYPE_T_3]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_T_4]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_S_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_S_2]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_Z_1]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_Z_2]: {x: 3, y: -3},
+        [FieldPiece.SUBTYPE_O_1]: {x: 4, y: -2},
     };
 
     /**
@@ -523,9 +523,13 @@ class Field {
      */
     _fixPiecePlacement() {
         clearInterval(this._pieceInterval);
-        for (let square of this._piece || []) {
-            this._fillSquare(square.x, square.y);
-            if (square.y === 0) this._end = true;
+        if (this._piece) {
+            let squaresCount = 0;
+            for (let square of this._piece || []) {
+                this._fillSquare(square.x, square.y);
+                squaresCount++;
+            }
+            if (squaresCount < 4) this._end = true;
         }
         this._addPoints();
         this._piece = null;
