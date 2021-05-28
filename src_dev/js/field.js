@@ -426,6 +426,9 @@ class Field {
         document.addEventListener('setPause', (e) => {
             this._pause();
         });
+        document.addEventListener('setEnd', (e) => {
+            this._end = true;
+        });
     }
 
     /**
@@ -529,7 +532,9 @@ class Field {
                 this._fillSquare(square.x, square.y);
                 squaresCount++;
             }
-            if (squaresCount < 4) this._end = true;
+            if (squaresCount < 4) {
+                document.dispatchEvent(new CustomEvent('setEnd'));
+            }
         }
         this._addPoints();
         this._piece = null;
