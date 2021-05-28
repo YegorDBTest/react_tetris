@@ -6,13 +6,19 @@
 }
 
 
+body {
+    color: var(--color-light);
+    background-color: var(--color-dark);
+}
+
+
 #app > div {
     position: absolute;
     width: 146px;
-    height: 261px;
-    top: 50%;
+    height: 221px;
+    top: 20px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0);
 }
 
 #score-element {
@@ -32,12 +38,12 @@
 
 #pause-play-element {
     position: absolute;
-    top: 65px;
+    top: 180px;
     left: 105px;
     cursor: pointer;
     width: 41px;
     height: 41px;
-    background-color: #999;
+    background-color: var(--color-light);
 }
 #pause-play-element:after {
     content: "";
