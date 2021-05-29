@@ -353,6 +353,14 @@ class FieldPiece {
 
 /** Tetris field. */
 class Field {
+    static SPEED_LOW = 1;
+    static SPEED_NORMAL = 2;
+    static SPEED_HIGH = 3;
+    static LAG_BY_SPEED = {
+      [Field.SPEED_LOW]: 1000,
+      [Field.SPEED_NORMAL]: 500,
+      [Field.SPEED_HIGH]: 250,
+    };
 
     static COLORS = {
         background: '#f8f5f1',
@@ -390,6 +398,7 @@ class Field {
         this._pieceInterval = null;
         this._points = 0;
         this._removedLinesCount = 0;
+        this._speed = Field.SPEED_LOW;
         this._paused = false;
         this._end = false;
 
@@ -428,6 +437,12 @@ class Field {
         });
         document.addEventListener('setEnd', (e) => {
             this._end = true;
+        });
+        document.addEventListener('increaseSpeed', (e) => {
+            this._increaseSpeed();
+        });
+        document.addEventListener('decreaseSpeed', (e) => {
+            this._decreaseSpeed();
         });
     }
 
@@ -570,7 +585,25 @@ class Field {
         this._paused = false;
         this._pieceInterval = setInterval(() => {
             this._movePieceDown();
-        }, 1000);
+        }, Field.LAG_BY_SPEED[this._speed]);
+    }
+
+    /** Increase speed. */
+    _increaseSpeed() {
+        if (this._speed == Field.SPEED_HIGH) return;
+        this._speed++;
+        document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
+            value: this._speed,
+        }}));
+    }
+
+    /** Decrease speed. */
+    _decreaseSpeed() {
+        if (this._speed == Field.SPEED_LOW) return;
+        this._speed--;
+        document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
+            value: this._speed,
+        }}));
     }
 
     /**
