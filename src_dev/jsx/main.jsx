@@ -87,7 +87,7 @@ class PausePlay extends React.Component {
 }
 
 
-class Notification extends React.Component {
+class NotificationHandler extends React.Component {
 
   constructor(props) {
     super(props);
@@ -141,6 +141,53 @@ class Notification extends React.Component {
 }
 
 
+class SpeedHandler extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: '1',
+    };
+
+    this._setValue = (e) => {
+      this.setState({
+        value: e.detail.value,
+      });
+    };
+
+    this._clickUp = (e) => {
+      document.dispatchEvent(new CustomEvent('increaseSpeed'));
+    };
+
+    this._clickDown = (e) => {
+      document.dispatchEvent(new CustomEvent('decreaseSpeed'));
+    };
+  }
+
+  componentDidMount() {
+    document.addEventListener('setSpeed', this._setValue);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('setSpeed', this._setValue);
+  }
+
+  render() {
+    return (
+        <div id="speed-element">
+          <div id="speed-element-up"
+               className="speed-element-button"
+               onClick={this._clickUp} />
+          <div id="speed-element-value">{this.state.value}</div>
+          <div id="speed-element-down"
+               className="speed-element-button"
+               onClick={this._clickDown} />
+        </div>
+    );
+  }
+}
+
+
 class App extends React.Component {
 
   componentDidMount() {
@@ -153,7 +200,8 @@ class App extends React.Component {
           <Score />
           <div id="field-element"/>
           <div id="preview-element"/>
-          <Notification />
+          <SpeedHandler />
+          <NotificationHandler />
           <PausePlay />
         </div>
     );

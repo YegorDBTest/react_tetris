@@ -36,6 +36,36 @@ body {
     left: 105px;
 }
 
+#speed-element {
+    position: absolute;
+    top: 88px;
+    left: 105px;
+}
+#speed-element-up:after {
+  clip-path: path('M21 2 L 39 18 L 2 18 Z');
+}
+#speed-element-value {
+    width: 41px;
+    text-align: center;
+    padding: 5px 0;
+}
+#speed-element-down:after {
+  clip-path: path('M21 18 L 39 2 L 2 2 Z');
+}
+.speed-element-button {
+  width: 41px;
+  height: 20px;
+  background-color: var(--color-light);
+  cursor: pointer;
+}
+.speed-element-button:after {
+  content: "";
+  position: absolute;
+  background-color: var(--color-dark);
+  width: 100%;
+  height: 100%;
+}
+
 #notification-element {
     position: absolute;
     top: 20px;

@@ -493,6 +493,10 @@ class Field {
         this._play();
     }
 
+    /**
+     * Rotate piece.
+     * @private
+     */
     _rotatePiece() {
         if (!this.isPieceActive) return;
         if (this._piece.rotate()) {
@@ -588,22 +592,34 @@ class Field {
         }, Field.LAG_BY_SPEED[this._speed]);
     }
 
-    /** Increase speed. */
+    /**
+     * Increase speed.
+     * @private
+     */
     _increaseSpeed() {
         if (this._speed == Field.SPEED_HIGH) return;
         this._speed++;
-        document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
-            value: this._speed,
-        }}));
+        this._fireSetSpeedEvent();
     }
 
-    /** Decrease speed. */
+    /**
+     * Decrease speed.
+     * @private
+     */
     _decreaseSpeed() {
         if (this._speed == Field.SPEED_LOW) return;
         this._speed--;
-        document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
-            value: this._speed,
-        }}));
+        this._fireSetSpeedEvent();
+    }
+
+    /**
+     * Fire set speed event.
+     * @private
+     */
+    _fireSetSpeedEvent() {
+      document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
+          value: this._speed,
+      }}));
     }
 
     /**
