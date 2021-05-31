@@ -401,11 +401,7 @@ class Field {
         this._speed = Field.SPEED_LOW;
         this._paused = false;
         this._end = false;
-
         this._matrix = [];
-        for (let i = 0; i < height; i++) {
-            this._matrix.push(this._createEmptyRow());
-        }
 
         this._screen = new TDG.screen.Screen('field-element', {
             dimensions: [width * this._squareSide + 1, height * this._squareSide + 1],
@@ -422,7 +418,6 @@ class Field {
 
         this._drawMainBackground();
         this._drawPreviewBackground();
-        this._addPiece();
 
         document.addEventListener('keydown', (e) => {
             let handler = Field.KEYDOWN_HANDLERS[e.code];
@@ -430,7 +425,11 @@ class Field {
             this[handler]();
         });
         document.addEventListener('setPlay', (e) => {
-            this._play();
+            if (this._end) {
+              this._newGame();
+            } else {
+              this._play();
+            }
         });
         document.addEventListener('setPause', (e) => {
             this._pause();
@@ -444,6 +443,8 @@ class Field {
         document.addEventListener('decreaseSpeed', (e) => {
             this._decreaseSpeed();
         });
+
+        this._newGame();
     }
 
     /**
@@ -478,6 +479,21 @@ class Field {
      */
     isSquareFree(x, y) {
         return !this._matrix[y][x];
+    }
+
+    /**
+     * New game.
+     * @private
+     */
+    _newGame() {
+      this._nextPiece = null;
+      this._end = false;
+      this._matrix = [];
+      for (let i = 0; i < this.height; i++) {
+          this._matrix.push(this._createEmptyRow());
+      }
+      this._refreshSolidSquares();
+      this._addPiece();
     }
 
     /**
