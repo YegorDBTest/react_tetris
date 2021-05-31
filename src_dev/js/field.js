@@ -577,7 +577,7 @@ class Field {
     _pause() {
         if (this._end) return;
         this._paused = true;
-        clearInterval(this._pieceInterval);
+        this._clearPieceInterval();
     }
 
     /**
@@ -587,9 +587,7 @@ class Field {
     _play() {
         if (this._end) return;
         this._paused = false;
-        this._pieceInterval = setInterval(() => {
-            this._movePieceDown();
-        }, Field.LAG_BY_SPEED[this._speed]);
+        this._setPieceInterval();
     }
 
     /**
@@ -598,7 +596,9 @@ class Field {
      */
     _increaseSpeed() {
         if (this._speed == Field.SPEED_HIGH) return;
+        this._clearPieceInterval();
         this._speed++;
+        this._setPieceInterval();
         this._fireSetSpeedEvent();
     }
 
@@ -608,7 +608,9 @@ class Field {
      */
     _decreaseSpeed() {
         if (this._speed == Field.SPEED_LOW) return;
+        this._clearPieceInterval();
         this._speed--;
+        this._setPieceInterval();
         this._fireSetSpeedEvent();
     }
 
@@ -620,6 +622,24 @@ class Field {
       document.dispatchEvent(new CustomEvent('setSpeed', {detail: {
           value: this._speed,
       }}));
+    }
+
+    /**
+     * Clear piece interval.
+     * @private
+     */
+    _clearPieceInterval() {
+      clearInterval(this._pieceInterval);
+    }
+
+    /**
+     * Set piece interval.
+     * @private
+     */
+    _setPieceInterval() {
+      this._pieceInterval = setInterval(() => {
+          this._movePieceDown();
+      }, Field.LAG_BY_SPEED[this._speed]);
     }
 
     /**
